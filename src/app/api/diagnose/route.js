@@ -18,9 +18,11 @@ export async function POST(req) {
       );
   
       const data = await response.json();
+      console.log('Diagnosis API response data:', data);
   
       return new Response(JSON.stringify(data), { status: 200 });
     } catch (err) {
+      console.log("Error in /api/diagnose:", err);
       return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
   }

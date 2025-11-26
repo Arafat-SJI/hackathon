@@ -3,6 +3,7 @@ import { PiTextAlignLeftBold } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
 import { MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { LuFileCheck2 } from "react-icons/lu";
+import { AiOutlineRobot } from "react-icons/ai";
 
 
 export const navItems1 = [
@@ -39,5 +40,10 @@ export const navItems2 = [
         href: "/report-analysis",
         label: "Report Analysis",
         icon: <LuFileCheck2 size={20} />,
+    },
+    {
+        href: "/ai-report-analysis",
+        label: "AI Report Analysis",
+        icon: <AiOutlineRobot size={20} />,
     },
 ]
