@@ -5,6 +5,9 @@ import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import React, { useState, useEffect } from "react";
+import { FaArrowRight } from "react-icons/fa";
+import Loader from './../../components/common/Loader/Loader';
+
 
 export default function Page() {
   const [description, setDescription] = useState("");
@@ -47,7 +50,7 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description,
-          diseases_list: diseases,
+          diseases_list: diseases||'',
           myuuid: "550e8400-e29b-41d4-a716-446655440000",
           lang: "en",
           timezone: "America/New_York",
@@ -84,7 +87,7 @@ export default function Page() {
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               rows={5}
               placeholder="Enter patient description..."
-              value={description}
+              value={description||''}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
@@ -93,12 +96,24 @@ export default function Page() {
               type="text"
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               placeholder="Enter possible diseases. Example: Diabetes, Hypertension."
-              value={diseases}
+              value={diseases||''}
               onChange={(e) => setDiseases(e.target.value)}
-              required
+              
             />
+            {/* <GenerateButton loading={loading} text="Analyze" /> */}
 
-            <GenerateButton loading={loading} text="Analyze" />
+
+        <div className="flex items-center justify-center bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white px-6 py-3 h-14 rounded-md hover:bg-gradient-to-r hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition cursor-pointer">
+            <button
+                type="submit"
+                disabled={loading}
+                className='cursor-pointer'
+            >
+                {loading ? <Loader /> : "Analyze"}
+            </button>
+            {loading ? <></> : <FaArrowRight className="ms-1 w-4 h-4" />}
+        </div>
+
           </form>
           {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
         </div>
@@ -106,7 +121,7 @@ export default function Page() {
         <div className="w-full lg:w-2/3">
           {diagnosisResults.length > 0 && (
             <div className="relative p-4 bg-gray-50 border-l-8 border-cyan-500 rounded-lg shadow-design max-h-[700px] overflow-y-auto">
-              <ResponseHeader title="AI Diagnosis Results" icon="/images/icons/wired-flat-12-layers-hover-slide-a.gif" />
+              <ResponseHeader title="Analysis Results" icon="/images/icons/wired-flat-12-layers-hover-slide-a.gif" />
 
               <div className={`${loading ? "blur-sm pointer-events-none" : ""} grid grid-cols-1 md:grid-cols-3 gap-4`}>
                 {diagnosisResults.map((item, index) => {
