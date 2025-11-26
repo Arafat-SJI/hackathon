@@ -87,7 +87,7 @@ export default function Page() {
             <textarea
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               rows={5}
-              placeholder="Enter patient description..."
+              placeholder="Enter Medical Summary..."
               value={description||''}
               onChange={(e) => setDescription(e.target.value)}
               required

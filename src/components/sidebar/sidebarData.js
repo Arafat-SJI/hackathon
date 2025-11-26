@@ -5,12 +5,17 @@ import { MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { LuFileCheck2 } from "react-icons/lu";
 
 
-export const navItems1 = [
+export const navItems = [
     {
-        href: "/generate-medical-summary",
-        label: "Generate Medical Summary",
-        icon: <PiTextAlignLeftBold size={20} />,
+        href: "/info-about-specific-disease",
+        label: "Specific Disease Details",
+        icon: <FaUserDoctor size={20} />,
     },
+]
+
+
+export const navItems1 = [
+   
     {
         href: "/generate-initial-questions",
         label: "Generate Follow-Up Questions",
@@ -21,10 +26,11 @@ export const navItems1 = [
         label: "Generate Assessment Questions",
         icon: <MdOutlineAssignmentTurnedIn size={20} />,
     },
-    {
-        href: "/info-about-specific-disease",
-        label: "Info About Specific Disease",
-        icon: <FaUserDoctor size={20} />,
+
+     {
+        href: "/generate-medical-summary",
+        label: "Generate Medical Summary",
+        icon: <PiTextAlignLeftBold size={20} />,
     },
 
 ];

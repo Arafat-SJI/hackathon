@@ -54,8 +54,14 @@ export default function Page() {
 
       if (data.result === "success") {
         saveSummaryToLocal(data.data.summary);
+        localStorage.setItem("analyze-disease-description",data.data.summary);
+           localStorage.setItem("analyze-disease-diseases",[]);
+          localStorage.setItem("analyze-disease-results",[]);
+      
+      
       } else {
         setError("Failed to summarize.");
+
       }
     } catch (err) {
       console.error(err);

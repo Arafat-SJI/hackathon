@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import NavItem from "./NavItem";
-import { navItems1, navItems2 } from "./sidebarData";
+import { navItems, navItems1, navItems2 } from "./sidebarData";
 import { BsLayoutSidebar, BsLayoutSidebarReverse } from "react-icons/bs";
 
 export default function Sidebar() {
@@ -47,6 +47,8 @@ export default function Sidebar() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
+                    <NavItem navItems={navItems} title="Info" collapsed={collapsed} />
+
                     <NavItem navItems={navItems1} title="Generate" collapsed={collapsed} />
                     <NavItem navItems={navItems2} title="Analysis" collapsed={collapsed} />
                 </div>
