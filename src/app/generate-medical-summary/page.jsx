@@ -3,6 +3,7 @@
 import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
+import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import React, { useState, useEffect } from "react";
 
@@ -83,6 +84,13 @@ export default function Page() {
     }
   };
 
+  const handleReset = () => {
+    setDescription("");
+    setSummary("");
+    localStorage.removeItem("create-summary-description");
+    localStorage.removeItem("create-summary-summary");
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <NavHeader title="Generate Medical Summary" icon="/images/icons/wired-flat-56-document-hover-swipe.gif" />
@@ -99,6 +107,10 @@ export default function Page() {
         <GenerateButton loading={loading} text="Summarize" />
 
       </form>
+
+      <div>
+        <ResetButton handleReset={handleReset} />
+      </div>
 
       {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
 

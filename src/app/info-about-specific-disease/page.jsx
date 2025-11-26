@@ -3,6 +3,7 @@
 import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
+import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import React, { useState, useEffect } from "react";
 
@@ -22,9 +23,9 @@ export default function Page() {
     if (savedMedicalDesc) setMedicalDescription(savedMedicalDesc);
     if (savedInfo && savedDisease) {
       setInfo(savedInfo);
-    
+
     } else {
-      localStorage.setItem("disease-info-response","");
+      localStorage.setItem("disease-info-response", "");
       setInfo("");
     }
   }, []);
@@ -79,6 +80,15 @@ export default function Page() {
     }
   };
 
+  const handleReset = () => {
+    setDisease("");
+    setMedicalDescription("");
+    setInfo("");
+    localStorage.removeItem("disease-info-response");
+    localStorage.removeItem("disease-info-disease");
+    localStorage.removeItem("disease-info-medicalDescription");
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <NavHeader title="Info About Specific Disease" icon="/images/icons/wired-flat-19-magnifier-zoom-search-hover-spin.gif" />
@@ -105,6 +115,10 @@ export default function Page() {
         <GenerateButton loading={loading} text="Get Info" />
       </form>
 
+      <div>
+        <ResetButton handleReset={handleReset} />
+      </div>
+
       {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
 
       {info && (
@@ -116,6 +130,8 @@ export default function Page() {
           )}
         </div>
       )}
+
+
     </div>
   );
 }
