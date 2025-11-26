@@ -60,8 +60,20 @@ export default function Page() {
       
       
       } else {
-        setError("Failed to summarize.");
 
+    const savedSummary = localStorage.getItem("create-summary-summary");
+
+     setSummary("");
+    localStorage.setItem("create-summary-summary", "");
+
+        if(data?.details[0]?.reason){
+
+        setError(data?.details[0]?.reason);
+
+        }
+        else {
+        setError("Failed to summarize.");
+        }
       }
     } catch (err) {
       console.error(err);

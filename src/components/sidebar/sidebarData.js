@@ -16,16 +16,16 @@ export const navItems = [
 
 export const navItems1 = [
    
-    {
-        href: "/generate-initial-questions",
-        label: "Generate Follow-Up Questions",
-        icon: <TbUserQuestion size={20} />,
-    },
-    {
-        href: "/generate-assessment-questions",
-        label: "Generate Assessment Questions",
-        icon: <MdOutlineAssignmentTurnedIn size={20} />,
-    },
+    // {
+    //     href: "/generate-initial-questions",
+    //     label: "Generate Follow-Up Questions",
+    //     icon: <TbUserQuestion size={20} />,
+    // },
+    // {
+    //     href: "/generate-assessment-questions",
+    //     label: "Generate Assessment Questions",
+    //     icon: <MdOutlineAssignmentTurnedIn size={20} />,
+    // },
 
      {
         href: "/generate-medical-summary",
