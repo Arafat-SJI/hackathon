@@ -13,7 +13,7 @@ export default function Sidebar() {
             <div
                 className={`
           fixed md:relative h-screen bg-gray-100 shadow-lg flex flex-col transition-all duration-500 overflow-hidden
-          ${collapsed ? "w-16" : "w-[360px]"}
+          ${collapsed ? "w-20" : "w-[380px]"}
           z-50
         `}
             >
@@ -22,6 +22,7 @@ export default function Sidebar() {
           ${collapsed ? "text-center text-xl p-4" : "text-3xl text-center"}
         `}
                 >
+                    <img src="/images/icons/aaa.png" alt="logo" className="w-11 h-11 absolute left-1 top-5" />
                     {!collapsed && <span>Doctor AI Assistant</span>}
 
                     <div className="absolute right-2 top-2 cursor-pointer">
