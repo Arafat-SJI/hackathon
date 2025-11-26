@@ -22,7 +22,7 @@ export default function Sidebar() {
           ${collapsed ? "text-center text-xl p-4" : "text-3xl text-center"}
         `}
                 >
-                    {!collapsed && <span>MedicoAI App</span>}
+                    {!collapsed && <span>Doctor AI Assistant</span>}
 
                     <div className="absolute right-2 top-2 cursor-pointer">
                         {!collapsed && (
