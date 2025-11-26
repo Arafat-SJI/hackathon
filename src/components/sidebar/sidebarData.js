@@ -42,14 +42,14 @@ export const navItems2 = [
         label: "Analyze Possible Disease",
         icon: <FaRegFileLines size={20} />,
     },
-    {
-        href: "/report-analysis",
-        label: "Report Analysis",
-        icon: <LuFileCheck2 size={20} />,
-    },
+    // {
+    //     href: "/report-analysis",
+    //     label: "Report Analysis",
+    //     icon: <LuFileCheck2 size={20} />,
+    // },
     {
         href: "/ai-report-analysis",
-        label: "AI Report Analysis",
+        label: "AI Diagnostic Report Analysis",
         icon: <AiOutlineRobot size={20} />,
     },
 ]
