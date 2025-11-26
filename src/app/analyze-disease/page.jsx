@@ -21,6 +21,7 @@ export default function Page() {
     const savedDiseases = localStorage.getItem("analyze-disease-diseases");
     const savedResults = localStorage.getItem("analyze-disease-results");
 
+    
     if (savedDescription) setDescription(savedDescription);
     if (savedDiseases) setDiseases(savedDiseases);
     if (savedResults) setDiagnosisResults(JSON.parse(savedResults));
