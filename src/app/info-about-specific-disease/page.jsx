@@ -20,7 +20,13 @@ export default function Page() {
 
     if (savedDisease) setDisease(savedDisease);
     if (savedMedicalDesc) setMedicalDescription(savedMedicalDesc);
-    if (savedInfo) setInfo(savedInfo);
+    if (savedInfo && savedDisease) {
+      setInfo(savedInfo);
+    
+    } else {
+      localStorage.setItem("disease-info-response","");
+      setInfo("");
+    }
   }, []);
 
   useEffect(() => {
