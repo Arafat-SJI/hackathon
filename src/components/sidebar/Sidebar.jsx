@@ -56,7 +56,7 @@ export default function Sidebar() {
 
                 {!collapsed && (
                     <div className="mt-auto p-4 border-t border-gray-400 text-center text-sm text-cyan-700">
-                        © 2025 MedicoAI App
+                        © 2025 Doctor AI Assistant
                     </div>
                 )}
             </div>
