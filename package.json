@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pm2-start": "PORT=8000 pm2 restart npm --name 'medico-app' -- run start",
-    "pm2-restart": "PORT=8000 pm2 restart npm --name 'medico-app' -- run start"
+    "pm2-start": "PORT=8000 pm2 start npm --name 'noorify' -- run start",
+    "pm2-restart": "PORT=8000 pm2 restart npm --name 'noorify' -- run start"
+
   },
   "dependencies": {
     "formidable": "^3.5.4",
