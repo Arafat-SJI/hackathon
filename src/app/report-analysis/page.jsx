@@ -59,7 +59,7 @@ export default function Page() {
       if (!response.ok) throw new Error("API request failed");
 
       const data = await response.json();
-      setResult(data);
+      setResult(data?.result);
     } catch (err) {
       console.error(err);
       setError(err.message || "Something went wrong.");
