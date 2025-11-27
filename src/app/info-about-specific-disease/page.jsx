@@ -5,7 +5,10 @@ import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
+import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState, useEffect } from "react";
+import { useUser } from '@/contexts/UserContext';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const [disease, setDisease] = useState("");
@@ -13,6 +16,14 @@ export default function Page() {
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { currentUser } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'doctor') {
+      router.push('/patient-management');
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
     const savedDisease = localStorage.getItem("disease-info-disease");
@@ -23,7 +34,6 @@ export default function Page() {
     if (savedMedicalDesc) setMedicalDescription(savedMedicalDesc);
     if (savedInfo && savedDisease) {
       setInfo(savedInfo);
-
     } else {
       localStorage.setItem("disease-info-response", "");
       setInfo("");

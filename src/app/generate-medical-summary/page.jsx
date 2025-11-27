@@ -5,29 +5,64 @@ import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
+import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState, useEffect } from "react";
+import { useUser } from '@/contexts/UserContext';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const [description, setDescription] = useState("");
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const { currentUser } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
-    const savedDescription = localStorage.getItem("create-summary-description");
-    const savedSummary = localStorage.getItem("create-summary-summary");
-
-    if (savedDescription) setDescription(savedDescription);
-    if (savedSummary) setSummary(savedSummary);
-  }, []);
+    if (currentUser && currentUser.role !== 'doctor') {
+      router.push('/patient-management');
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
-    localStorage.setItem("create-summary-description", description);
-  }, [description]);
+    if (selectedPatient) {
+      const savedDescription = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-description`);
+      const savedSummary = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-summary`);
+
+      if (savedDescription) setDescription(savedDescription);
+      if (savedSummary) setSummary(savedSummary);
+    } else {
+      setDescription("");
+      setSummary("");
+    }
+  }, [selectedPatient]);
+
+  useEffect(() => {
+    if (selectedPatient) {
+      localStorage.setItem(`patient-${selectedPatient.id}-create-summary-description`, description);
+    }
+  }, [description, selectedPatient]);
 
   const saveSummaryToLocal = (newSummary) => {
     setSummary(newSummary);
-    localStorage.setItem("create-summary-summary", newSummary);
+    if (selectedPatient) {
+      localStorage.setItem(`patient-${selectedPatient.id}-create-summary-summary`, newSummary);
+      // Save to patient's history
+      const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+      const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
+      if (patientIndex !== -1) {
+        if (!patients[patientIndex].history['generate-medical-summary']) {
+          patients[patientIndex].history['generate-medical-summary'] = [];
+        }
+        patients[patientIndex].history['generate-medical-summary'].push({
+          timestamp: new Date().toISOString(),
+          description,
+          summary: newSummary
+        });
+        localStorage.setItem('patients', JSON.stringify(patients));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -97,6 +132,8 @@ export default function Page() {
       <NavHeader title="Generate Medical Summary" icon="/images/icons/wired-flat-56-document-hover-swipe.gif" />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <PatientSelector selectedPatient={selectedPatient} onPatientChange={setSelectedPatient} />
+
         <textarea
           className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
           rows={8}
