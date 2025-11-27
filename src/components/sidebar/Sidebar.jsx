@@ -3,7 +3,7 @@
 import { useState } from "react";
 import NavItem from "./NavItem";
 import { navItems, navItems1, navItems2 } from "./sidebarData";
-import { BsLayoutSidebar, BsLayoutSidebarReverse } from "react-icons/bs";
+import { BsLayoutSidebar, BsLayoutSidebarReverse,BsArrowsCollapse,BsPcDisplayHorizontal,BsArrowBarLeft,BsArrowBarRight } from "react-icons/bs";
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
@@ -23,12 +23,13 @@ export default function Sidebar() {
         `}
                 >
                     <img src="/images/icons/aaa.png" alt="logo" className="w-11 h-11 absolute left-1 top-5" />
-                    {!collapsed && <span>Doctor AI Assistant</span>}
+                    {!collapsed && <span className="text-2xl font-semibold" >Doctor's AI Assistant</span>}
 
                     <div className="absolute right-2 top-2 cursor-pointer">
                         {!collapsed && (
                             <button onClick={() => setCollapsed(true)} className="text-white cursor-pointer">
-                                <BsLayoutSidebar size={20} />
+                                {/* <BsLayoutSidebar size={20} /> */}
+                                  <BsArrowBarLeft size={20} />
                             </button>
                         )}
                     </div>
@@ -39,7 +40,7 @@ export default function Sidebar() {
                                 onClick={() => setCollapsed(false)}
                                 className="text-white cursor-pointer"
                             >
-                                <BsLayoutSidebarReverse size={20} />
+                                <BsArrowBarRight size={20} />
                             </button>
                         )}
                     </div>
@@ -48,10 +49,10 @@ export default function Sidebar() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    <NavItem navItems={navItems} title="Info" collapsed={collapsed} />
+                    <NavItem navItems={navItems} title="Knowledge Base" collapsed={collapsed} />
 
                     <NavItem navItems={navItems1} title="Generate" collapsed={collapsed} />
-                    <NavItem navItems={navItems2} title="Analysis" collapsed={collapsed} />
+                    <NavItem navItems={navItems2} title="AI Analyst" collapsed={collapsed} />
                 </div>
 
                 {!collapsed && (

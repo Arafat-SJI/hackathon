@@ -39,7 +39,7 @@ export const navItems1 = [
 export const navItems2 = [
     {
         href: "/analyze-disease",
-        label: "Analyze Possible Disease",
+        label: "Possible Disease",
         icon: <FaRegFileLines size={20} />,
     },
     // {
@@ -49,7 +49,7 @@ export const navItems2 = [
     // },
     {
         href: "/ai-report-analysis",
-        label: "AI Diagnostic Report Analysis",
+        label: "Diagnostic Report",
         icon: <AiOutlineRobot size={20} />,
     },
 ]

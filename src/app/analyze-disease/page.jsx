@@ -94,7 +94,7 @@ export default function Page() {
 
   return (
     <div className="px-10 mx-auto">
-      <NavHeader title="Analyze Possible Disease" icon="/images/icons/wired-flat-12-layers-hover-slide.gif" />
+      <NavHeader title="AI Possible Disease Analyst" icon="/images/icons/wired-flat-12-layers-hover-slide.gif" />
 
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/3">
@@ -118,6 +118,7 @@ export default function Page() {
             />
             {/* <GenerateButton loading={loading} text="Analyze" /> */}
 
+           <div className="flex items-center justify-between mt-4">
 
             <div className="flex items-center justify-center bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white px-6 py-3 h-14 rounded-md hover:bg-gradient-to-r hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition cursor-pointer">
               <button
@@ -129,12 +130,14 @@ export default function Page() {
               </button>
               {loading ? <></> : <FaArrowRight className="ms-1 w-4 h-4" />}
             </div>
-
-          </form>
-          <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-end gap-2">
             {/* <DownloadButton handleDownload={handleDownload} text="Download Analysis" /> */}
             <ResetButton handleReset={handleReset} />
-          </div>
+            </div>
+
+           </div> 
+          </form>
+      
           {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
         </div>
 

@@ -106,18 +106,22 @@ export default function Page() {
         <textarea
           className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
           rows={5}
-          placeholder="Enter patient medical description..."
+          placeholder="Enter disease description..."
           value={medicalDescription}
           onChange={(e) => setMedicalDescription(e.target.value)}
           required
         />
+        <div className="flex items-center justify-between mt-4">
 
-        <GenerateButton loading={loading} text="Get Info" />
+          <GenerateButton loading={loading} text="Get Info" />
+
+          <div>
+            <ResetButton handleReset={handleReset} />
+          </div>
+
+        </div>
       </form>
 
-      <div>
-        <ResetButton handleReset={handleReset} />
-      </div>
 
       {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
 

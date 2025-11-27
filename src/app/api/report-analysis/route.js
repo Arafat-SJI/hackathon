@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { GET_REPORT_ANALYSIS_URL } from "@/url/api";
 
-export const config = {
-  api: {
-    bodyParser: true, 
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: true, 
+//   },
+// };
 
 export async function POST(req) {
   try {
