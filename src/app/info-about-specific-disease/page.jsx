@@ -99,6 +99,8 @@ export default function Page() {
     localStorage.removeItem("disease-info-medicalDescription");
   };
 
+
+  
   return (
     <div className="max-w-4xl mx-auto">
       <NavHeader title="Info About Specific Disease" icon="/images/icons/wired-flat-19-magnifier-zoom-search-hover-spin.gif" />
