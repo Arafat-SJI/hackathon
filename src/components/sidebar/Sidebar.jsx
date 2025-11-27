@@ -4,9 +4,28 @@ import { useState } from "react";
 import NavItem from "./NavItem";
 import { navItems, navItems1, navItems2 } from "./sidebarData";
 import { BsLayoutSidebar, BsLayoutSidebarReverse } from "react-icons/bs";
+import { useUser } from "@/contexts/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
+    const { currentUser, logout } = useUser();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        router.push('/login');
+    };
+
+    if (!currentUser) {
+        return null; // Don't show sidebar if not logged in
+    }
+
+    const isDoctor = currentUser.role === 'doctor';
+
+    if (!isDoctor) {
+        return null; // Don't show sidebar for receptionists
+    }
 
     return (
         <div className="flex relative bg-gray-50 text-nowrap">
@@ -51,11 +70,23 @@ export default function Sidebar() {
 
                     <NavItem navItems={navItems1} title="Generate" collapsed={collapsed} />
                     <NavItem navItems={navItems2} title="Analysis" collapsed={collapsed} />
+                    <NavItem navItems={[{ href: "/medical-history", label: "Medical History", icon: <span>📋</span> }]} title="History" collapsed={collapsed} />
                 </div>
 
                 {!collapsed && (
-                    <div className="mt-auto p-4 border-t border-gray-400 text-center text-sm text-cyan-700">
-                        © 2025 MedicoAI App
+                    <div className="mt-auto p-4 border-t border-gray-400">
+                        <div className="text-center text-sm text-cyan-700 mb-2">
+                            Welcome, {currentUser.name}
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                        >
+                            Logout
+                        </button>
+                        <div className="text-center text-sm text-cyan-700 mt-2">
+                            © 2025 MedicoAI App
+                        </div>
                     </div>
                 )}
             </div>

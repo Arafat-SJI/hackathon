@@ -4,7 +4,11 @@ import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
+import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState } from "react";
+import { useUser } from '@/contexts/UserContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Page() {
   const [file, setFile] = useState(null);
@@ -12,6 +16,15 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const { currentUser } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'doctor') {
+      router.push('/patient-management');
+    }
+  }, [currentUser, router]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -66,6 +79,23 @@ export default function Page() {
 
       const data = await response.json();
       setResult(data);
+      // Save to patient's history
+      if (selectedPatient) {
+        const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+        const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
+        if (patientIndex !== -1) {
+          if (!patients[patientIndex].history['ai-report-analysis']) {
+            patients[patientIndex].history['ai-report-analysis'] = [];
+          }
+          patients[patientIndex].history['ai-report-analysis'].push({
+            timestamp: new Date().toISOString(),
+            reportType,
+            fileName: file.name,
+            result: data
+          });
+          localStorage.setItem('patients', JSON.stringify(patients));
+        }
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || "Something went wrong.");
@@ -79,6 +109,8 @@ export default function Page() {
       <NavHeader title="AI Diagnostic Report Analysis" icon="/images/icons/wired-flat-54-photo-hover-pinch.gif" />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <PatientSelector selectedPatient={selectedPatient} onPatientChange={setSelectedPatient} />
+
         <div>
           <label className="block text-sm font-medium mb-2">Report Type</label>
           <select

@@ -4,9 +4,12 @@ import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
+import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import Loader from './../../components/common/Loader/Loader';
+import { useUser } from '@/contexts/UserContext';
+import { useRouter } from 'next/navigation';
 
 
 export default function Page() {
@@ -15,29 +18,70 @@ export default function Page() {
   const [diagnosisResults, setDiagnosisResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const { currentUser } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
-    const savedDescription = localStorage.getItem("analyze-disease-description");
-    const savedDiseases = localStorage.getItem("analyze-disease-diseases");
-    const savedResults = localStorage.getItem("analyze-disease-results");
-
-    
-    if (savedDescription) setDescription(savedDescription);
-    if (savedDiseases) setDiseases(savedDiseases);
-    if (savedResults) setDiagnosisResults(JSON.parse(savedResults));
-  }, []);
+    if (currentUser && currentUser.role !== 'doctor') {
+      router.push('/patient-management');
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
-    localStorage.setItem("analyze-disease-description", description);
-  }, [description]);
+    if (selectedPatient) {
+      const savedDescription = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-description`);
+      const savedSummary = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-summary`);
+      const savedDiseases = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-diseases`);
+      const savedResults = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-results`);
+
+      // Use summary if available, otherwise use saved description
+      if (savedSummary) {
+        setDescription(savedSummary);
+      } else if (savedDescription) {
+        setDescription(savedDescription);
+      }
+      if (savedDiseases) setDiseases(savedDiseases);
+      if (savedResults) setDiagnosisResults(JSON.parse(savedResults));
+    } else {
+      setDescription("");
+      setDiseases("");
+      setDiagnosisResults([]);
+    }
+  }, [selectedPatient]);
 
   useEffect(() => {
-    localStorage.setItem("analyze-disease-diseases", diseases);
-  }, [diseases]);
+    if (selectedPatient) {
+      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-description`, description);
+    }
+  }, [description, selectedPatient]);
+
+  useEffect(() => {
+    if (selectedPatient) {
+      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-diseases`, diseases);
+    }
+  }, [diseases, selectedPatient]);
 
   const saveResultsToLocal = (results) => {
     setDiagnosisResults(results);
-    localStorage.setItem("analyze-disease-results", JSON.stringify(results));
+    if (selectedPatient) {
+      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-results`, JSON.stringify(results));
+      // Save to patient's history
+      const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+      const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
+      if (patientIndex !== -1) {
+        if (!patients[patientIndex].history['analyze-disease']) {
+          patients[patientIndex].history['analyze-disease'] = [];
+        }
+        patients[patientIndex].history['analyze-disease'].push({
+          timestamp: new Date().toISOString(),
+          description,
+          diseases,
+          results
+        });
+        localStorage.setItem('patients', JSON.stringify(patients));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -84,6 +128,8 @@ export default function Page() {
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/3">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <PatientSelector selectedPatient={selectedPatient} onPatientChange={setSelectedPatient} />
+
             <textarea
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               rows={5}
