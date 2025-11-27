@@ -3,6 +3,7 @@
 import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
+import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState, useEffect } from "react";
@@ -89,6 +90,15 @@ export default function Page() {
     }
   };
 
+  const handleReset = () => {
+    setDisease("");
+    setMedicalDescription("");
+    setInfo("");
+    localStorage.removeItem("disease-info-response");
+    localStorage.removeItem("disease-info-disease");
+    localStorage.removeItem("disease-info-medicalDescription");
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <NavHeader title="Info About Specific Disease" icon="/images/icons/wired-flat-19-magnifier-zoom-search-hover-spin.gif" />
@@ -106,14 +116,22 @@ export default function Page() {
         <textarea
           className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
           rows={5}
-          placeholder="Enter patient medical description..."
+          placeholder="Enter disease description..."
           value={medicalDescription}
           onChange={(e) => setMedicalDescription(e.target.value)}
           required
         />
+        <div className="flex items-center justify-between mt-4">
 
-        <GenerateButton loading={loading} text="Get Info" />
+          <GenerateButton loading={loading} text="Get Info" />
+
+          <div>
+            <ResetButton handleReset={handleReset} />
+          </div>
+
+        </div>
       </form>
+
 
       {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
 
@@ -126,6 +144,8 @@ export default function Page() {
           )}
         </div>
       )}
+
+
     </div>
   );
 }

@@ -106,7 +106,7 @@ export default function Page() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <NavHeader title="AI Diagnostic Report Analysis" icon="/images/icons/wired-flat-54-photo-hover-pinch.gif" />
+      <NavHeader title="AI Diagnostic Report Analyst" icon="/images/icons/wired-flat-54-photo-hover-pinch.gif" />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <PatientSelector selectedPatient={selectedPatient} onPatientChange={setSelectedPatient} />

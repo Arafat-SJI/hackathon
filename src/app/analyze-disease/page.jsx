@@ -8,6 +8,8 @@ import PatientSelector from "@/components/common/PatientSelector/PatientSelector
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import Loader from './../../components/common/Loader/Loader';
+import ResetButton from "@/components/common/ResetButton/ResetButton";
+import DownloadButton from "@/components/common/DownloadButton/DownloadButton";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 
@@ -95,7 +97,7 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description,
-          diseases_list: diseases||'',
+          diseases_list: diseases || '',
           myuuid: "550e8400-e29b-41d4-a716-446655440000",
           lang: "en",
           timezone: "America/New_York",
@@ -121,9 +123,22 @@ export default function Page() {
     }
   };
 
+  const handleReset = () => {
+    setDescription("");
+    setDiseases("");
+    setDiagnosisResults([]);
+    localStorage.removeItem("analyze-disease-description");
+    localStorage.removeItem("analyze-disease-diseases");
+    localStorage.removeItem("analyze-disease-results");
+  };
+
+  const handleDownload = () => {
+   
+  };
+
   return (
     <div className="px-10 mx-auto">
-      <NavHeader title="Analyze Possible Disease" icon="/images/icons/wired-flat-12-layers-hover-slide.gif" />
+      <NavHeader title="AI Possible Disease Analyst" icon="/images/icons/wired-flat-12-layers-hover-slide.gif" />
 
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/3">
@@ -134,7 +149,7 @@ export default function Page() {
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               rows={5}
               placeholder="Enter Medical Summary..."
-              value={description||''}
+              value={description || ''}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
@@ -143,25 +158,32 @@ export default function Page() {
               type="text"
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none  focus:border-cyan-600"
               placeholder="Enter possible diseases. Example: Diabetes, Hypertension."
-              value={diseases||''}
+              value={diseases || ''}
               onChange={(e) => setDiseases(e.target.value)}
-              
+
             />
             {/* <GenerateButton loading={loading} text="Analyze" /> */}
 
+           <div className="flex items-center justify-between mt-4">
 
-        <div className="flex items-center justify-center bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white px-6 py-3 h-14 rounded-md hover:bg-gradient-to-r hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition cursor-pointer">
-            <button
+            <div className="flex items-center justify-center bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white px-6 py-3 h-14 rounded-md hover:bg-gradient-to-r hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition cursor-pointer">
+              <button
                 type="submit"
                 disabled={loading}
                 className='cursor-pointer'
-            >
+              >
                 {loading ? <Loader /> : "Analyze"}
-            </button>
-            {loading ? <></> : <FaArrowRight className="ms-1 w-4 h-4" />}
-        </div>
+              </button>
+              {loading ? <></> : <FaArrowRight className="ms-1 w-4 h-4" />}
+            </div>
+            <div className="flex items-center justify-end gap-2">
+            {/* <DownloadButton handleDownload={handleDownload} text="Download Analysis" /> */}
+            <ResetButton handleReset={handleReset} />
+            </div>
 
+           </div> 
           </form>
+      
           {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
         </div>
 

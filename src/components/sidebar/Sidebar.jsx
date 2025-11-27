@@ -3,7 +3,7 @@
 import { useState } from "react";
 import NavItem from "./NavItem";
 import { navItems, navItems1, navItems2 } from "./sidebarData";
-import { BsLayoutSidebar, BsLayoutSidebarReverse } from "react-icons/bs";
+import { BsLayoutSidebar, BsLayoutSidebarReverse,BsArrowsCollapse,BsPcDisplayHorizontal,BsArrowBarLeft,BsArrowBarRight } from "react-icons/bs";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
 
@@ -32,7 +32,7 @@ export default function Sidebar() {
             <div
                 className={`
           fixed md:relative h-screen bg-gray-100 shadow-lg flex flex-col transition-all duration-500 overflow-hidden
-          ${collapsed ? "w-16" : "w-[360px]"}
+          ${collapsed ? "w-20" : "w-[380px]"}
           z-50
         `}
             >
@@ -41,12 +41,14 @@ export default function Sidebar() {
           ${collapsed ? "text-center text-xl p-4" : "text-3xl text-center"}
         `}
                 >
-                    {!collapsed && <span>Doctor AI Assistant</span>}
+                    <img src="/images/icons/aaa.png" alt="logo" className="w-11 h-11 absolute left-1 top-5" />
+                    {!collapsed && <span className="text-2xl font-semibold" >Doctor's AI Assistant</span>}
 
                     <div className="absolute right-2 top-2 cursor-pointer">
                         {!collapsed && (
                             <button onClick={() => setCollapsed(true)} className="text-white cursor-pointer">
-                                <BsLayoutSidebar size={20} />
+                                {/* <BsLayoutSidebar size={20} /> */}
+                                  <BsArrowBarLeft size={20} />
                             </button>
                         )}
                     </div>
@@ -57,7 +59,7 @@ export default function Sidebar() {
                                 onClick={() => setCollapsed(false)}
                                 className="text-white cursor-pointer"
                             >
-                                <BsLayoutSidebarReverse size={20} />
+                                <BsArrowBarRight size={20} />
                             </button>
                         )}
                     </div>
@@ -66,10 +68,10 @@ export default function Sidebar() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    <NavItem navItems={navItems} title="Info" collapsed={collapsed} />
+                    <NavItem navItems={navItems} title="Knowledge Base" collapsed={collapsed} />
 
                     <NavItem navItems={navItems1} title="Generate" collapsed={collapsed} />
-                    <NavItem navItems={navItems2} title="Analysis" collapsed={collapsed} />
+                    <NavItem navItems={navItems2} title="AI Analyst" collapsed={collapsed} />
                     <NavItem navItems={[{ href: "/medical-history", label: "Medical History", icon: <span>📋</span> }]} title="History" collapsed={collapsed} />
                 </div>
 
@@ -85,7 +87,7 @@ export default function Sidebar() {
                             Logout
                         </button>
                         <div className="text-center text-sm text-cyan-700 mt-2">
-                            © 2025 MedicoAI App
+                            © 2025 Doctor AI Assistant
                         </div>
                     </div>
                 )}

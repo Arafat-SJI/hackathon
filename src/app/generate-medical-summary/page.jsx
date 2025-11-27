@@ -3,6 +3,7 @@
 import GenerateButton from "@/components/common/GenerateButton/GenerateButton";
 import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
+import ResetButton from "@/components/common/ResetButton/ResetButton";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import React, { useState, useEffect } from "react";
@@ -89,25 +90,24 @@ export default function Page() {
 
       if (data.result === "success") {
         saveSummaryToLocal(data.data.summary);
-        localStorage.setItem("analyze-disease-description",data.data.summary);
-           localStorage.setItem("analyze-disease-diseases",[]);
-          localStorage.setItem("analyze-disease-results",[]);
-      
-      
+        localStorage.setItem("analyze-disease-description", data.data.summary);
+        localStorage.setItem("analyze-disease-diseases", []);
+        localStorage.setItem("analyze-disease-results", []);
+
+
       } else {
 
-    const savedSummary = localStorage.getItem("create-summary-summary");
 
-     setSummary("");
-    localStorage.setItem("create-summary-summary", "");
+        setSummary("");
+        localStorage.setItem("create-summary-summary", "");
+        localStorage.setItem("analyze-disease-description", "");
+        if (data?.details[0]?.reason) {
 
-        if(data?.details[0]?.reason){
-
-        setError(data?.details[0]?.reason);
+          setError(data?.details[0]?.reason);
 
         }
         else {
-        setError("Failed to summarize.");
+          setError("Failed to summarize.");
         }
       }
     } catch (err) {
@@ -116,6 +116,15 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReset = () => {
+    setDescription("");
+    setSummary("");
+    localStorage.removeItem("create-summary-description");
+    localStorage.removeItem("create-summary-summary");
+    localStorage.setItem("analyze-disease-description", "");
+    localStorage.setItem("analyze-disease-results", "");
   };
 
   return (
@@ -133,9 +142,18 @@ export default function Page() {
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-        <GenerateButton loading={loading} text="Summarize" />
+        <div className="flex items-center justify-between mt-4">
+
+
+          <GenerateButton loading={loading} text="Summarize" />
+          <div>
+            <ResetButton handleReset={handleReset} />
+          </div>
+        </div>
 
       </form>
+
+
 
       {error && <div className="mt-4 text-red-600 font-medium">{error}</div>}
 
