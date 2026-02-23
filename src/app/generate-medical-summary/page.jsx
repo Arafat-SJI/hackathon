@@ -9,6 +9,8 @@ import PatientSelector from "@/components/common/PatientSelector/PatientSelector
 import React, { useState, useEffect } from "react";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { getDraft, saveDraft, deleteDraft } from '@/services/draftService';
+import { addHistoryEntry } from '@/services/historyService';
 
 export default function Page() {
   const [description, setDescription] = useState("");
@@ -26,42 +28,45 @@ export default function Page() {
   }, [currentUser, router]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      const savedDescription = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-description`);
-      const savedSummary = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-summary`);
+    const loadDrafts = async () => {
+      if (selectedPatient) {
+        const { draft: descDraft } = await getDraft('create-summary-description', selectedPatient.id);
+        const { draft: summaryDraft } = await getDraft('create-summary-summary', selectedPatient.id);
 
-      if (savedDescription) setDescription(savedDescription);
-      if (savedSummary) setSummary(savedSummary);
-    } else {
-      setDescription("");
-      setSummary("");
-    }
+        if (descDraft?.data) setDescription(descDraft.data);
+        else setDescription("");
+        
+        if (summaryDraft?.data) setSummary(summaryDraft.data);
+        else setSummary("");
+      } else {
+        setDescription("");
+        setSummary("");
+      }
+    };
+
+    loadDrafts();
   }, [selectedPatient]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      localStorage.setItem(`patient-${selectedPatient.id}-create-summary-description`, description);
-    }
+    const saveDescription = async () => {
+      if (selectedPatient && description) {
+        await saveDraft('create-summary-description', description, selectedPatient.id);
+      }
+    };
+    saveDescription();
   }, [description, selectedPatient]);
 
-  const saveSummaryToLocal = (newSummary) => {
+  const saveSummaryToLocal = async (newSummary) => {
     setSummary(newSummary);
     if (selectedPatient) {
-      localStorage.setItem(`patient-${selectedPatient.id}-create-summary-summary`, newSummary);
+      await saveDraft('create-summary-summary', newSummary, selectedPatient.id);
+      
       // Save to patient's history
-      const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-      const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
-      if (patientIndex !== -1) {
-        if (!patients[patientIndex].history['generate-medical-summary']) {
-          patients[patientIndex].history['generate-medical-summary'] = [];
-        }
-        patients[patientIndex].history['generate-medical-summary'].push({
-          timestamp: new Date().toISOString(),
-          description,
-          summary: newSummary
-        });
-        localStorage.setItem('patients', JSON.stringify(patients));
-      }
+      await addHistoryEntry(selectedPatient.id, 'generate-medical-summary', {
+        timestamp: new Date().toISOString(),
+        description,
+        summary: newSummary
+      });
     }
   };
 
@@ -89,24 +94,20 @@ export default function Page() {
       const data = await response.json();
 
       if (data.result === "success") {
-        saveSummaryToLocal(data.data.summary);
-        localStorage.setItem("analyze-disease-description", data.data.summary);
-        localStorage.setItem("analyze-disease-diseases", []);
-        localStorage.setItem("analyze-disease-results", []);
-
-
-      } else {
-
-
-        setSummary("");
-        localStorage.setItem("create-summary-summary", "");
-        localStorage.setItem("analyze-disease-description", "");
-        if (data?.details[0]?.reason) {
-
-          setError(data?.details[0]?.reason);
-
+        await saveSummaryToLocal(data.data.summary);
+        // Save summary as draft for analyze-disease page
+        if (selectedPatient) {
+          await saveDraft('analyze-disease-description', data.data.summary, selectedPatient.id);
         }
-        else {
+      } else {
+        setSummary("");
+        if (selectedPatient) {
+          await deleteDraft('create-summary-summary', selectedPatient.id);
+          await deleteDraft('analyze-disease-description', selectedPatient.id);
+        }
+        if (data?.details[0]?.reason) {
+          setError(data?.details[0]?.reason);
+        } else {
           setError("Failed to summarize.");
         }
       }
@@ -118,13 +119,13 @@ export default function Page() {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setDescription("");
     setSummary("");
-    localStorage.removeItem("create-summary-description");
-    localStorage.removeItem("create-summary-summary");
-    localStorage.setItem("analyze-disease-description", "");
-    localStorage.setItem("analyze-disease-results", "");
+    if (selectedPatient) {
+      await deleteDraft('create-summary-description', selectedPatient.id);
+      await deleteDraft('create-summary-summary', selectedPatient.id);
+    }
   };
 
   return (

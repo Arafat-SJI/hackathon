@@ -4,6 +4,12 @@ import React, { useState, useEffect } from 'react';
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { getPatients, createPatient, updatePatient, deletePatient } from '@/services/patientService';
+import { getAppointments, createAppointment } from '@/services/appointmentService';
+import { addHistoryEntry } from '@/services/historyService';
+import { saveDraft } from '@/services/draftService';
+import { signUp, updateUserProfile } from '@/services/authService';
+import { supabase } from '@/lib/supabase';
 
 export default function PatientManagement() {
   const [patients, setPatients] = useState([]);
@@ -29,49 +35,82 @@ export default function PatientManagement() {
   }, [currentUser, router]);
 
   useEffect(() => {
-    // Load patients
-    const storedPatients = localStorage.getItem('patients');
-    if (storedPatients) {
-      setPatients(JSON.parse(storedPatients));
-    } else {
-      // Initialize with sample patients if none exist
-      const samplePatients = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', phone: '123-456-7890', dob: '1980-01-01', doctorId: '', history: {} },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '987-654-3210', dob: '1985-05-15', doctorId: '', history: {} },
-        { id: 3, name: 'Bob Johnson', email: 'bob@example.com', phone: '555-123-4567', dob: '1990-10-20', doctorId: '', history: {} },
-      ];
-      setPatients(samplePatients);
-      localStorage.setItem('patients', JSON.stringify(samplePatients));
-    }
+    const loadData = async () => {
+      // Load patients
+      const { patients: patientsData, error: patientsError } = await getPatients();
+      if (!patientsError && patientsData) {
+        const transformedPatients = patientsData.map(p => ({
+          id: p.id,
+          name: p.name,
+          email: p.email,
+          phone: p.phone,
+          dob: p.dob,
+          doctorId: p.doctor_id,
+          history: {}, // History is now in separate table
+        }));
+        setPatients(transformedPatients);
+      }
 
-    // Load doctors and receptionists
-    const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-      const users = JSON.parse(storedUsers);
-      const doctorList = users.filter(user => user.role === 'doctor');
-      const receptionistList = users.filter(user => user.role === 'receptionist');
-      setDoctors(doctorList);
-      setReceptionists(receptionistList);
-    }
+      // Load doctors and receptionists from user_profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('*');
+      
+      if (!profilesError && profiles) {
+        const doctorList = profiles.filter(p => p.role === 'doctor').map(p => ({
+          id: p.id,
+          name: p.name,
+          email: '', // Email is in auth.users, not in profile
+          role: p.role,
+        }));
+        const receptionistList = profiles.filter(p => p.role === 'receptionist').map(p => ({
+          id: p.id,
+          name: p.name,
+          email: '',
+          role: p.role,
+        }));
+        setDoctors(doctorList);
+        setReceptionists(receptionistList);
+      }
 
-    // Load appointments
-    const storedAppointments = localStorage.getItem('appointments');
-    if (storedAppointments) {
-      setAppointments(JSON.parse(storedAppointments));
-    }
+      // Load appointments
+      const { appointments: appointmentsData, error: appointmentsError } = await getAppointments();
+      if (!appointmentsError && appointmentsData) {
+        const transformedAppointments = appointmentsData.map(a => ({
+          id: a.id,
+          patientId: a.patient_id,
+          doctorId: a.doctor_id,
+          date: a.date,
+          time: a.time,
+          reason: a.reason,
+        }));
+        setAppointments(transformedAppointments);
+      }
+    };
+
+    loadData();
   }, []);
 
-  const handleAddPatient = (e) => {
+  const handleAddPatient = async (e) => {
     e.preventDefault();
-    const patient = {
-      id: Date.now(),
-      ...newPatient,
-      history: {}
-    };
-    const updatedPatients = [...patients, patient];
-    setPatients(updatedPatients);
-    localStorage.setItem('patients', JSON.stringify(updatedPatients));
-    setNewPatient({ name: '', email: '', phone: '', dob: '' });
+    const { patient, error } = await createPatient(newPatient);
+    if (error) {
+      alert(`Error creating patient: ${error}`);
+      return;
+    }
+    if (patient) {
+      const transformedPatient = {
+        id: patient.id,
+        name: patient.name,
+        email: patient.email,
+        phone: patient.phone,
+        dob: patient.dob,
+        doctorId: patient.doctor_id,
+        history: {},
+      };
+      setPatients([...patients, transformedPatient]);
+      setNewPatient({ name: '', email: '', phone: '', dob: '', doctorId: '' });
+    }
   };
 
   const handleEditPatient = (patient) => {
@@ -79,55 +118,89 @@ export default function PatientManagement() {
     setNewPatient({ name: patient.name, email: patient.email, phone: patient.phone, dob: patient.dob, doctorId: patient.doctorId || '' });
   };
 
-  const handleUpdatePatient = (e) => {
+  const handleUpdatePatient = async (e) => {
     e.preventDefault();
-    const updatedPatients = patients.map(p =>
-      p.id === editingPatient.id ? { ...p, ...newPatient } : p
-    );
-    setPatients(updatedPatients);
-    localStorage.setItem('patients', JSON.stringify(updatedPatients));
-    setEditingPatient(null);
-    setNewPatient({ name: '', email: '', phone: '', dob: '' });
-  };
-
-  const handleDeletePatient = (id) => {
-    const updatedPatients = patients.filter(p => p.id !== id);
-    setPatients(updatedPatients);
-    localStorage.setItem('patients', JSON.stringify(updatedPatients));
-  };
-
-  const handleAddAppointment = (e) => {
-    e.preventDefault();
-    const appointment = {
-      id: Date.now(),
-      ...newAppointment,
-      patientId: parseInt(newAppointment.patientId)
-    };
-    const updatedAppointments = [...appointments, appointment];
-    setAppointments(updatedAppointments);
-    localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
-    setNewAppointment({ patientId: '', date: '', time: '', reason: '', doctorId: '' });
-  };
-
-  const handleAddReceptionist = (e) => {
-    e.preventDefault();
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Check if email already exists
-    if (users.find(u => u.email === newReceptionist.email)) {
-      alert('Email already exists');
+    const { patient, error } = await updatePatient(editingPatient.id, newPatient);
+    if (error) {
+      alert(`Error updating patient: ${error}`);
       return;
     }
+    if (patient) {
+      const transformedPatient = {
+        id: patient.id,
+        name: patient.name,
+        email: patient.email,
+        phone: patient.phone,
+        dob: patient.dob,
+        doctorId: patient.doctor_id,
+        history: {},
+      };
+      setPatients(patients.map(p => p.id === patient.id ? transformedPatient : p));
+      setEditingPatient(null);
+      setNewPatient({ name: '', email: '', phone: '', dob: '', doctorId: '' });
+    }
+  };
 
-    const receptionist = {
-      id: Date.now(),
-      ...newReceptionist,
-      role: 'receptionist'
-    };
-    users.push(receptionist);
-    localStorage.setItem('users', JSON.stringify(users));
-    setReceptionists([...receptionists, receptionist]);
-    setNewReceptionist({ name: '', email: '', password: '' });
+  const handleDeletePatient = async (id) => {
+    if (!confirm('Are you sure you want to delete this patient?')) return;
+    
+    const { error } = await deletePatient(id);
+    if (error) {
+      alert(`Error deleting patient: ${error}`);
+      return;
+    }
+    setPatients(patients.filter(p => p.id !== id));
+  };
+
+  const handleAddAppointment = async (e) => {
+    e.preventDefault();
+    const { appointment, error } = await createAppointment({
+      patientId: newAppointment.patientId,
+      doctorId: newAppointment.doctorId || null,
+      date: newAppointment.date,
+      time: newAppointment.time,
+      reason: newAppointment.reason,
+    });
+    if (error) {
+      alert(`Error creating appointment: ${error}`);
+      return;
+    }
+    if (appointment) {
+      const transformedAppointment = {
+        id: appointment.id,
+        patientId: appointment.patient_id,
+        doctorId: appointment.doctor_id,
+        date: appointment.date,
+        time: appointment.time,
+        reason: appointment.reason,
+      };
+      setAppointments([...appointments, transformedAppointment]);
+      setNewAppointment({ patientId: '', date: '', time: '', reason: '', doctorId: '' });
+    }
+  };
+
+  const handleAddReceptionist = async (e) => {
+    e.preventDefault();
+    const { user, error } = await signUp(
+      newReceptionist.email,
+      newReceptionist.password,
+      newReceptionist.name,
+      'receptionist'
+    );
+    if (error) {
+      alert(`Error creating receptionist: ${error}`);
+      return;
+    }
+    if (user) {
+      const newReceptionistData = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+      setReceptionists([...receptionists, newReceptionistData]);
+      setNewReceptionist({ name: '', email: '', password: '' });
+    }
   };
 
   const handleEditReceptionist = (receptionist) => {
@@ -135,25 +208,39 @@ export default function PatientManagement() {
     setNewReceptionist({ name: receptionist.name, email: receptionist.email, password: '' });
   };
 
-  const handleUpdateReceptionist = (e) => {
+  const handleUpdateReceptionist = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map(u => 
-      u.id === editingReceptionist.id ? { ...u, ...newReceptionist } : u
-    );
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    setReceptionists(updatedUsers.filter(u => u.role === 'receptionist'));
-    setEditingReceptionist(null);
-    setNewReceptionist({ name: '', email: '', password: '' });
+    const updateData = { name: newReceptionist.name };
+    if (newReceptionist.password) {
+      // Note: Password update would need to be handled via Supabase Auth
+      // For now, we'll just update the profile
+      alert('Password updates are not yet supported. Please use Supabase dashboard.');
+    }
+    const { profile, error } = await updateUserProfile(updateData);
+    if (error) {
+      alert(`Error updating receptionist: ${error}`);
+      return;
+    }
+    if (profile) {
+      const updatedReceptionist = {
+        id: editingReceptionist.id,
+        name: profile.name,
+        email: editingReceptionist.email,
+        role: 'receptionist',
+      };
+      setReceptionists(receptionists.map(r => r.id === editingReceptionist.id ? updatedReceptionist : r));
+      setEditingReceptionist(null);
+      setNewReceptionist({ name: '', email: '', password: '' });
+    }
   };
 
-  const handleDeleteReceptionist = (id) => {
-    if (confirm('Are you sure you want to delete this receptionist?')) {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const updatedUsers = users.filter(u => u.id !== id);
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      setReceptionists(updatedUsers.filter(u => u.role === 'receptionist'));
-    }
+  const handleDeleteReceptionist = async (id) => {
+    if (!confirm('Are you sure you want to delete this receptionist?')) return;
+    
+    // Note: User deletion should be done via Supabase Admin API
+    // For now, we'll just remove from the list (actual deletion requires admin access)
+    alert('User deletion requires admin access. Please use Supabase dashboard to delete users.');
+    // setReceptionists(receptionists.filter(r => r.id !== id));
   };
 
   const handleGenerateSummary = async (e) => {
@@ -184,26 +271,17 @@ export default function PatientManagement() {
 
       if (data.result === "success") {
         setGeneratedSummary(data.data.summary);
+        
         // Save to patient's history
-        const patientsData = JSON.parse(localStorage.getItem('patients') || '[]');
-        const patientIndex = patientsData.findIndex(p => p.id === selectedPatientForSummary.id);
-        if (patientIndex !== -1) {
-          if (!patientsData[patientIndex].history) {
-            patientsData[patientIndex].history = {};
-          }
-          if (!patientsData[patientIndex].history['generate-medical-summary']) {
-            patientsData[patientIndex].history['generate-medical-summary'] = [];
-          }
-          patientsData[patientIndex].history['generate-medical-summary'].push({
-            timestamp: new Date().toISOString(),
-            description: summaryDescription,
-            summary: data.data.summary
-          });
-          localStorage.setItem('patients', JSON.stringify(patientsData));
-        }
-        // Also save to localStorage for the doctor's page
-        localStorage.setItem(`patient-${selectedPatientForSummary.id}-create-summary-description`, summaryDescription);
-        localStorage.setItem(`patient-${selectedPatientForSummary.id}-create-summary-summary`, data.data.summary);
+        await addHistoryEntry(selectedPatientForSummary.id, 'generate-medical-summary', {
+          timestamp: new Date().toISOString(),
+          description: summaryDescription,
+          summary: data.data.summary
+        });
+
+        // Save drafts for the doctor's page
+        await saveDraft('create-summary-description', summaryDescription, selectedPatientForSummary.id);
+        await saveDraft('create-summary-summary', data.data.summary, selectedPatientForSummary.id);
       } else {
         alert("Failed to summarize.");
       }
@@ -366,8 +444,8 @@ export default function PatientManagement() {
               className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={selectedPatientForSummary?.id || ''}
               onChange={(e) => {
-                const patient = patients.find(p => p.id === parseInt(e.target.value));
-                setSelectedPatientForSummary(patient);
+                const patient = patients.find(p => p.id === e.target.value);
+                setSelectedPatientForSummary(patient || null);
               }}
               required
             >
