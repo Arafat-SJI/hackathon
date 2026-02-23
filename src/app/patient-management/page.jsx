@@ -221,20 +221,21 @@ export default function PatientManagement() {
   };
 
   return (
-    <div className="p-6">
+    <div className="px-10 mx-auto">
       <NavHeader title="Patient Management" icon="/images/icons/wired-flat-37-approve-checked-simple-hover-pinch.gif" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Add/Edit Patient */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold mb-4">
+        <div className="bg-white p-6 rounded-lg shadow-design border border-gray-100">
+          <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
             {editingPatient ? 'Edit Patient' : 'Add New Patient'}
           </h3>
           <form onSubmit={editingPatient ? handleUpdatePatient : handleAddPatient} className="space-y-4">
             <input
               type="text"
               placeholder="Full Name"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newPatient.name}
               onChange={(e) => setNewPatient({...newPatient, name: e.target.value})}
               required
@@ -242,7 +243,7 @@ export default function PatientManagement() {
             <input
               type="email"
               placeholder="Email"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newPatient.email}
               onChange={(e) => setNewPatient({...newPatient, email: e.target.value})}
               required
@@ -250,7 +251,7 @@ export default function PatientManagement() {
             <input
               type="tel"
               placeholder="Phone"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newPatient.phone}
               onChange={(e) => setNewPatient({...newPatient, phone: e.target.value})}
               required
@@ -258,13 +259,13 @@ export default function PatientManagement() {
             <input
               type="date"
               placeholder="Date of Birth"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newPatient.dob}
               onChange={(e) => setNewPatient({...newPatient, dob: e.target.value})}
               required
             />
             <select
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newPatient.doctorId}
               onChange={(e) => setNewPatient({...newPatient, doctorId: e.target.value})}
             >
@@ -275,7 +276,7 @@ export default function PatientManagement() {
             </select>
             <button
               type="submit"
-              className="w-full bg-cyan-600 text-white py-2 px-4 rounded hover:bg-cyan-700"
+              className="w-full bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white py-3 px-4 rounded-md hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {editingPatient ? 'Update Patient' : 'Add Patient'}
             </button>
@@ -286,7 +287,7 @@ export default function PatientManagement() {
                   setEditingPatient(null);
                   setNewPatient({ name: '', email: '', phone: '', dob: '', doctorId: '' });
                 }}
-                className="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2"
+                className="w-full bg-gray-500 text-white py-3 px-4 rounded-md hover:bg-gray-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg mt-2"
               >
                 Cancel
               </button>
@@ -295,11 +296,14 @@ export default function PatientManagement() {
         </div>
 
         {/* Add Appointment */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold mb-4">Schedule Appointment</h3>
+        <div className="bg-white p-6 rounded-lg shadow-design border border-gray-100">
+          <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
+            Schedule Appointment
+          </h3>
           <form onSubmit={handleAddAppointment} className="space-y-4">
             <select
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newAppointment.patientId}
               onChange={(e) => setNewAppointment({...newAppointment, patientId: e.target.value})}
               required
@@ -311,27 +315,28 @@ export default function PatientManagement() {
             </select>
             <input
               type="date"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newAppointment.date}
               onChange={(e) => setNewAppointment({...newAppointment, date: e.target.value})}
               required
             />
             <input
               type="time"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
               value={newAppointment.time}
               onChange={(e) => setNewAppointment({...newAppointment, time: e.target.value})}
               required
             />
             <textarea
               placeholder="Reason for appointment"
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+              rows={3}
               value={newAppointment.reason}
               onChange={(e) => setNewAppointment({...newAppointment, reason: e.target.value})}
               required
             />
             <select
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newAppointment.doctorId}
               onChange={(e) => setNewAppointment({...newAppointment, doctorId: e.target.value})}
               required
@@ -343,7 +348,7 @@ export default function PatientManagement() {
             </select>
             <button
               type="submit"
-              className="w-full bg-cyan-600 text-white py-2 px-4 rounded hover:bg-cyan-700"
+              className="w-full bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white py-3 px-4 rounded-md hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Schedule Appointment
             </button>
@@ -351,11 +356,14 @@ export default function PatientManagement() {
         </div>
 
         {/* Generate Medical Summary */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold mb-4">Generate Medical Summary</h3>
+        <div className="bg-white p-6 rounded-lg shadow-design border border-gray-100">
+          <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
+            Generate Medical Summary
+          </h3>
           <form onSubmit={handleGenerateSummary} className="space-y-4">
             <select
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={selectedPatientForSummary?.id || ''}
               onChange={(e) => {
                 const patient = patients.find(p => p.id === parseInt(e.target.value));
@@ -369,7 +377,7 @@ export default function PatientManagement() {
               ))}
             </select>
             <textarea
-              className="w-full p-3 border-2 border-cyan-600 rounded-md"
+              className="w-full p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
               rows={4}
               placeholder="Enter patient description..."
               value={summaryDescription}
@@ -379,58 +387,63 @@ export default function PatientManagement() {
             <button
               type="submit"
               disabled={summaryLoading}
-              className="w-full bg-cyan-600 text-white py-2 px-4 rounded hover:bg-cyan-700 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white py-3 px-4 rounded-md hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {summaryLoading ? 'Generating...' : 'Generate Summary'}
             </button>
           </form>
           {generatedSummary && (
-            <div className="mt-4 p-4 bg-gray-50 border-l-8 border-cyan-500 rounded-lg">
-              <h4 className="font-semibold mb-2">Generated Summary:</h4>
-              <p className="text-sm">{generatedSummary}</p>
+            <div className="mt-4 p-4 bg-gray-50 border-l-8 border-cyan-500 rounded-lg shadow-design">
+              <h4 className="font-bold mb-2 text-gray-800">Generated Summary:</h4>
+              <p className="text-sm text-gray-700 leading-relaxed">{generatedSummary}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Patients List */}
-      <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold mb-4">Patients</h3>
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-design border border-gray-100">
+        <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+          <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
+          Patients
+        </h3>
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Name</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Phone</th>
-                <th className="px-4 py-2 text-left">DOB</th>
-                <th className="px-4 py-2 text-left">Primary Doctor</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+              <tr className="bg-gradient-to-r from-cyan-50 to-blue-50">
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Name</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Email</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Phone</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">DOB</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Primary Doctor</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {patients.map(patient => {
+              {patients.map((patient, index) => {
                 const doctor = doctors.find(d => d.id === patient.doctorId);
                 return (
-                  <tr key={patient.id} className="border-b">
-                    <td className="px-4 py-2">{patient.name}</td>
-                    <td className="px-4 py-2">{patient.email}</td>
-                    <td className="px-4 py-2">{patient.phone}</td>
-                    <td className="px-4 py-2">{patient.dob}</td>
-                    <td className="px-4 py-2">{doctor ? doctor.name : 'Not Assigned'}</td>
-                    <td className="px-4 py-2">
-                      <button
-                        onClick={() => handleEditPatient(patient)}
-                        className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeletePatient(patient.id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
+                  <tr key={patient.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition-colors`}>
+                    <td className="px-6 py-4 font-medium text-gray-800">{patient.name}</td>
+                    <td className="px-6 py-4 text-gray-600">{patient.email}</td>
+                    <td className="px-6 py-4 text-gray-600">{patient.phone}</td>
+                    <td className="px-6 py-4 text-gray-600">{patient.dob}</td>
+                    <td className="px-6 py-4 text-gray-600">{doctor ? doctor.name : <span className="text-gray-400 italic">Not Assigned</span>}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditPatient(patient)}
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-blue-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeletePatient(patient.id)}
+                          className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-md hover:from-red-600 hover:to-red-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -441,30 +454,33 @@ export default function PatientManagement() {
       </div>
 
       {/* Appointments List */}
-      <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold mb-4">Appointments</h3>
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-design border border-gray-100">
+        <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+          <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
+          Appointments
+        </h3>
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Patient</th>
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Time</th>
-                <th className="px-4 py-2 text-left">Doctor</th>
-                <th className="px-4 py-2 text-left">Reason</th>
+              <tr className="bg-gradient-to-r from-cyan-50 to-blue-50">
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Patient</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Date</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Time</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Doctor</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Reason</th>
               </tr>
             </thead>
             <tbody>
-              {appointments.map(appointment => {
+              {appointments.map((appointment, index) => {
                 const patient = patients.find(p => p.id === appointment.patientId);
                 const doctor = doctors.find(d => d.id === appointment.doctorId);
                 return (
-                  <tr key={appointment.id} className="border-b">
-                    <td className="px-4 py-2">{patient?.name || 'Unknown'}</td>
-                    <td className="px-4 py-2">{appointment.date}</td>
-                    <td className="px-4 py-2">{appointment.time}</td>
-                    <td className="px-4 py-2">{doctor?.name || 'Unknown'}</td>
-                    <td className="px-4 py-2">{appointment.reason}</td>
+                  <tr key={appointment.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition-colors`}>
+                    <td className="px-6 py-4 font-medium text-gray-800">{patient?.name || <span className="text-gray-400 italic">Unknown</span>}</td>
+                    <td className="px-6 py-4 text-gray-600">{appointment.date}</td>
+                    <td className="px-6 py-4 text-gray-600">{appointment.time}</td>
+                    <td className="px-6 py-4 text-gray-600">{doctor?.name || <span className="text-gray-400 italic">Unknown</span>}</td>
+                    <td className="px-6 py-4 text-gray-600">{appointment.reason}</td>
                   </tr>
                 );
               })}
@@ -474,27 +490,30 @@ export default function PatientManagement() {
       </div>
 
       {/* Receptionist Management */}
-      <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Receptionist Management</h3>
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-design border border-gray-100">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-cyan-700 rounded"></span>
+            Receptionist Management
+          </h3>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-md hover:from-red-600 hover:to-red-700 font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
           >
             Logout
           </button>
         </div>
         
         {/* Add/Edit Receptionist Form */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-3">
+        <div className="mb-8 bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <h4 className="text-lg font-bold mb-4 text-gray-800">
             {editingReceptionist ? 'Edit Receptionist' : 'Add New Receptionist'}
           </h4>
           <form onSubmit={editingReceptionist ? handleUpdateReceptionist : handleAddReceptionist} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
               placeholder="Full Name"
-              className="p-3 border-2 border-cyan-600 rounded-md"
+              className="p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newReceptionist.name}
               onChange={(e) => setNewReceptionist({...newReceptionist, name: e.target.value})}
               required
@@ -502,7 +521,7 @@ export default function PatientManagement() {
             <input
               type="email"
               placeholder="Email"
-              className="p-3 border-2 border-cyan-600 rounded-md"
+              className="p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newReceptionist.email}
               onChange={(e) => setNewReceptionist({...newReceptionist, email: e.target.value})}
               required
@@ -510,14 +529,14 @@ export default function PatientManagement() {
             <input
               type="password"
               placeholder="Password"
-              className="p-3 border-2 border-cyan-600 rounded-md"
+              className="p-3 border-2 border-cyan-600 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               value={newReceptionist.password}
               onChange={(e) => setNewReceptionist({...newReceptionist, password: e.target.value})}
               required={!editingReceptionist}
             />
             <button
               type="submit"
-              className="bg-cyan-600 text-white py-3 px-4 rounded hover:bg-cyan-700 md:col-span-3"
+              className="bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500 text-white py-3 px-4 rounded-md hover:from-cyan-800 hover:via-cyan-700 hover:to-cyan-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] md:col-span-3"
             >
               {editingReceptionist ? 'Update Receptionist' : 'Add Receptionist'}
             </button>
@@ -528,7 +547,7 @@ export default function PatientManagement() {
                   setEditingReceptionist(null);
                   setNewReceptionist({ name: '', email: '', password: '' });
                 }}
-                className="bg-gray-500 text-white py-3 px-4 rounded hover:bg-gray-600 md:col-span-3"
+                className="bg-gray-500 text-white py-3 px-4 rounded-md hover:bg-gray-600 font-semibold transition-all duration-200 shadow-md hover:shadow-lg md:col-span-3"
               >
                 Cancel
               </button>
@@ -540,30 +559,32 @@ export default function PatientManagement() {
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Name</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+              <tr className="bg-gradient-to-r from-cyan-50 to-blue-50">
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Name</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Email</th>
+                <th className="px-6 py-4 text-left font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {receptionists.map(receptionist => (
-                <tr key={receptionist.id} className="border-b">
-                  <td className="px-4 py-2">{receptionist.name}</td>
-                  <td className="px-4 py-2">{receptionist.email}</td>
-                  <td className="px-4 py-2">
-                    <button
-                      onClick={() => handleEditReceptionist(receptionist)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteReceptionist(receptionist.id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
+              {receptionists.map((receptionist, index) => (
+                <tr key={receptionist.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition-colors`}>
+                  <td className="px-6 py-4 font-medium text-gray-800">{receptionist.name}</td>
+                  <td className="px-6 py-4 text-gray-600">{receptionist.email}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditReceptionist(receptionist)}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-blue-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteReceptionist(receptionist.id)}
+                        className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-md hover:from-red-600 hover:to-red-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -9,13 +9,18 @@ import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
-    const { currentUser, logout } = useUser();
+    const { currentUser, logout, loading } = useUser();
     const router = useRouter();
 
     const handleLogout = () => {
         logout();
         router.push('/login');
     };
+
+    // Wait for user to load before deciding to show/hide sidebar
+    if (loading) {
+        return null; // Still loading, wait
+    }
 
     if (!currentUser) {
         return null; // Don't show sidebar if not logged in
@@ -82,7 +87,7 @@ export default function Sidebar() {
                         </div>
                         <button
                             onClick={handleLogout}
-                            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                            className="w-full bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500"
                         >
                             Logout
                         </button>
