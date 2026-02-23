@@ -5,6 +5,7 @@ import NavHeader from "@/components/common/NavHeader/NavHeader";
 import PatientSelector from "@/components/common/PatientSelector/PatientSelector";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { getPatientHistory } from '@/services/historyService';
 
 export default function MedicalHistory() {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -19,12 +20,20 @@ export default function MedicalHistory() {
   }, [currentUser, router]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHistory(selectedPatient.history || {});
-    } else {
-      setHistory({});
-    }
+    const loadHistory = async () => {
+      if (selectedPatient) {
+        const { history: historyData, error } = await getPatientHistory(selectedPatient.id);
+        if (!error && historyData) {
+          setHistory(historyData);
+        } else {
+          setHistory({});
+        }
+      } else {
+        setHistory({});
+      }
+    };
+
+    loadHistory();
   }, [selectedPatient]);
 
   const formatDate = (dateString) => {

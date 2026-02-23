@@ -9,6 +9,7 @@ import PatientSelector from "@/components/common/PatientSelector/PatientSelector
 import React, { useState, useEffect } from "react";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { getDraft, saveDraft, deleteDraft } from '@/services/draftService';
 
 export default function Page() {
   const [disease, setDisease] = useState("");
@@ -26,31 +27,44 @@ export default function Page() {
   }, [currentUser, router]);
 
   useEffect(() => {
-    const savedDisease = localStorage.getItem("disease-info-disease");
-    const savedMedicalDesc = localStorage.getItem("disease-info-medicalDescription");
-    const savedInfo = localStorage.getItem("disease-info-response");
+    const loadDrafts = async () => {
+      const { draft: diseaseDraft } = await getDraft('disease-info-disease');
+      const { draft: descDraft } = await getDraft('disease-info-medicalDescription');
+      const { draft: infoDraft } = await getDraft('disease-info-response');
 
-    if (savedDisease) setDisease(savedDisease);
-    if (savedMedicalDesc) setMedicalDescription(savedMedicalDesc);
-    if (savedInfo && savedDisease) {
-      setInfo(savedInfo);
-    } else {
-      localStorage.setItem("disease-info-response", "");
-      setInfo("");
-    }
+      if (diseaseDraft?.data) setDisease(diseaseDraft.data);
+      if (descDraft?.data) setMedicalDescription(descDraft.data);
+      if (infoDraft?.data && diseaseDraft?.data) {
+        setInfo(infoDraft.data);
+      } else {
+        setInfo("");
+      }
+    };
+
+    loadDrafts();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("disease-info-disease", disease);
+    const saveDisease = async () => {
+      if (disease) {
+        await saveDraft('disease-info-disease', disease);
+      }
+    };
+    saveDisease();
   }, [disease]);
 
   useEffect(() => {
-    localStorage.setItem("disease-info-medicalDescription", medicalDescription);
+    const saveDescription = async () => {
+      if (medicalDescription) {
+        await saveDraft('disease-info-medicalDescription', medicalDescription);
+      }
+    };
+    saveDescription();
   }, [medicalDescription]);
 
-  const saveResponse = (content) => {
+  const saveResponse = async (content) => {
     setInfo(content);
-    localStorage.setItem("disease-info-response", content);
+    await saveDraft('disease-info-response', content);
   };
 
   const handleSubmit = async (e) => {
@@ -78,7 +92,7 @@ export default function Page() {
       const data = await response.json();
 
       if (data.result === "success") {
-        saveResponse(data.data.content);
+        await saveResponse(data.data.content);
       } else {
         setError("Failed to fetch disease info.");
       }
@@ -90,13 +104,13 @@ export default function Page() {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setDisease("");
     setMedicalDescription("");
     setInfo("");
-    localStorage.removeItem("disease-info-response");
-    localStorage.removeItem("disease-info-disease");
-    localStorage.removeItem("disease-info-medicalDescription");
+    await deleteDraft('disease-info-response');
+    await deleteDraft('disease-info-disease');
+    await deleteDraft('disease-info-medicalDescription');
   };
 
 

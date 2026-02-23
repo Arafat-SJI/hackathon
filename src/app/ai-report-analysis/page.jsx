@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { addHistoryEntry } from '@/services/historyService';
 
 export default function Page() {
   const [file, setFile] = useState(null);
@@ -81,20 +82,12 @@ export default function Page() {
       setResult(data);
       // Save to patient's history
       if (selectedPatient) {
-        const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-        const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
-        if (patientIndex !== -1) {
-          if (!patients[patientIndex].history['ai-report-analysis']) {
-            patients[patientIndex].history['ai-report-analysis'] = [];
-          }
-          patients[patientIndex].history['ai-report-analysis'].push({
-            timestamp: new Date().toISOString(),
-            reportType,
-            fileName: file.name,
-            result: data
-          });
-          localStorage.setItem('patients', JSON.stringify(patients));
-        }
+        await addHistoryEntry(selectedPatient.id, 'ai-report-analysis', {
+          timestamp: new Date().toISOString(),
+          reportType,
+          fileName: file.name,
+          result: data
+        });
       }
     } catch (err) {
       console.error(err);

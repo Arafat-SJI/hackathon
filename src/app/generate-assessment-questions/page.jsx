@@ -5,6 +5,7 @@ import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import React, { useState, useEffect } from "react";
+import { getDraft, saveDraft } from '@/services/draftService';
 
 export default function Page() {
   const [description, setDescription] = useState("");
@@ -13,20 +14,29 @@ export default function Page() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedDescription = localStorage.getItem("emergency-questions-description");
-    const savedQuestions = localStorage.getItem("emergency-questions-response");
+    const loadDrafts = async () => {
+      const { draft: descDraft } = await getDraft('emergency-questions-description');
+      const { draft: questionsDraft } = await getDraft('emergency-questions-response');
 
-    if (savedDescription) setDescription(savedDescription);
-    if (savedQuestions) setQuestions(JSON.parse(savedQuestions));
+      if (descDraft?.data) setDescription(descDraft.data);
+      if (questionsDraft?.data) setQuestions(Array.isArray(questionsDraft.data) ? questionsDraft.data : []);
+    };
+
+    loadDrafts();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("emergency-questions-description", description);
+    const saveDescription = async () => {
+      if (description) {
+        await saveDraft('emergency-questions-description', description);
+      }
+    };
+    saveDescription();
   }, [description]);
 
-  const saveResponse = (data) => {
+  const saveResponse = async (data) => {
     setQuestions(data);
-    localStorage.setItem("emergency-questions-response", JSON.stringify(data));
+    await saveDraft('emergency-questions-response', data);
   };
 
   const handleSubmit = async (e) => {
@@ -51,7 +61,7 @@ export default function Page() {
       const data = await response.json();
 
       if (data.result === "success") {
-        saveResponse(data.data.questions);
+        await saveResponse(data.data.questions);
       } else {
         setError("Failed to generate questions.");
       }

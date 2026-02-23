@@ -1,31 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { getPatients } from '@/services/patientService';
 
 const PatientSelector = ({ selectedPatient, onPatientChange }) => {
   const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load patients from localStorage
-    const storedPatients = localStorage.getItem('patients');
-    if (storedPatients) {
-      setPatients(JSON.parse(storedPatients));
-    } else {
-      // Initialize with sample patients
-      const samplePatients = [
-        { id: 1, name: 'John Doe', history: {} },
-        { id: 2, name: 'Jane Smith', history: {} },
-        { id: 3, name: 'Bob Johnson', history: {} },
-      ];
-      setPatients(samplePatients);
-      localStorage.setItem('patients', JSON.stringify(samplePatients));
-    }
+    const loadPatients = async () => {
+      setLoading(true);
+      const { patients: patientsData, error } = await getPatients();
+      if (!error && patientsData) {
+        // Transform to match expected format
+        const transformedPatients = patientsData.map(p => ({
+          id: p.id,
+          name: p.name,
+          email: p.email,
+          phone: p.phone,
+          dob: p.dob,
+          doctorId: p.doctor_id,
+          history: {}, // History is now in separate table
+        }));
+        setPatients(transformedPatients);
+      }
+      setLoading(false);
+    };
+
+    loadPatients();
   }, []);
 
   const handleChange = (e) => {
-    const patientId = parseInt(e.target.value);
+    const patientId = e.target.value;
     const patient = patients.find(p => p.id === patientId);
-    onPatientChange(patient);
+    onPatientChange(patient || null);
   };
 
   return (
@@ -36,8 +44,9 @@ const PatientSelector = ({ selectedPatient, onPatientChange }) => {
         value={selectedPatient?.id || ''}
         onChange={handleChange}
         required
+        disabled={loading}
       >
-        <option value="" disabled>Select a patient</option>
+        <option value="" disabled>{loading ? 'Loading patients...' : 'Select a patient'}</option>
         {patients.map(patient => (
           <option key={patient.id} value={patient.id}>
             {patient.name}

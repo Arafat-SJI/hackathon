@@ -12,6 +12,8 @@ import ResetButton from "@/components/common/ResetButton/ResetButton";
 import DownloadButton from "@/components/common/DownloadButton/DownloadButton";
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { getDraft, saveDraft, deleteDraft } from '@/services/draftService';
+import { addHistoryEntry } from '@/services/historyService';
 
 
 export default function Page() {
@@ -31,58 +33,75 @@ export default function Page() {
   }, [currentUser, router]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      const savedDescription = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-description`);
-      const savedSummary = localStorage.getItem(`patient-${selectedPatient.id}-create-summary-summary`);
-      const savedDiseases = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-diseases`);
-      const savedResults = localStorage.getItem(`patient-${selectedPatient.id}-analyze-disease-results`);
+    const loadDrafts = async () => {
+      if (selectedPatient) {
+        // Load drafts
+        const { draft: summaryDraft } = await getDraft('create-summary-summary', selectedPatient.id);
+        const { draft: descDraft } = await getDraft('analyze-disease-description', selectedPatient.id);
+        const { draft: diseasesDraft } = await getDraft('analyze-disease-diseases', selectedPatient.id);
+        const { draft: resultsDraft } = await getDraft('analyze-disease-results', selectedPatient.id);
 
-      // Use summary if available, otherwise use saved description
-      if (savedSummary) {
-        setDescription(savedSummary);
-      } else if (savedDescription) {
-        setDescription(savedDescription);
+        // Use summary if available, otherwise use saved description
+        if (summaryDraft?.data) {
+          setDescription(summaryDraft.data);
+        } else if (descDraft?.data) {
+          setDescription(descDraft.data);
+        } else {
+          setDescription("");
+        }
+        
+        if (diseasesDraft?.data) {
+          setDiseases(diseasesDraft.data);
+        } else {
+          setDiseases("");
+        }
+        
+        if (resultsDraft?.data) {
+          setDiagnosisResults(Array.isArray(resultsDraft.data) ? resultsDraft.data : []);
+        } else {
+          setDiagnosisResults([]);
+        }
+      } else {
+        setDescription("");
+        setDiseases("");
+        setDiagnosisResults([]);
       }
-      if (savedDiseases) setDiseases(savedDiseases);
-      if (savedResults) setDiagnosisResults(JSON.parse(savedResults));
-    } else {
-      setDescription("");
-      setDiseases("");
-      setDiagnosisResults([]);
-    }
+    };
+
+    loadDrafts();
   }, [selectedPatient]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-description`, description);
-    }
+    const saveDescription = async () => {
+      if (selectedPatient && description) {
+        await saveDraft('analyze-disease-description', description, selectedPatient.id);
+      }
+    };
+    saveDescription();
   }, [description, selectedPatient]);
 
   useEffect(() => {
-    if (selectedPatient) {
-      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-diseases`, diseases);
-    }
+    const saveDiseases = async () => {
+      if (selectedPatient && diseases) {
+        await saveDraft('analyze-disease-diseases', diseases, selectedPatient.id);
+      }
+    };
+    saveDiseases();
   }, [diseases, selectedPatient]);
 
-  const saveResultsToLocal = (results) => {
+  const saveResultsToLocal = async (results) => {
     setDiagnosisResults(results);
     if (selectedPatient) {
-      localStorage.setItem(`patient-${selectedPatient.id}-analyze-disease-results`, JSON.stringify(results));
+      // Save draft
+      await saveDraft('analyze-disease-results', results, selectedPatient.id);
+      
       // Save to patient's history
-      const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-      const patientIndex = patients.findIndex(p => p.id === selectedPatient.id);
-      if (patientIndex !== -1) {
-        if (!patients[patientIndex].history['analyze-disease']) {
-          patients[patientIndex].history['analyze-disease'] = [];
-        }
-        patients[patientIndex].history['analyze-disease'].push({
-          timestamp: new Date().toISOString(),
-          description,
-          diseases,
-          results
-        });
-        localStorage.setItem('patients', JSON.stringify(patients));
-      }
+      await addHistoryEntry(selectedPatient.id, 'analyze-disease', {
+        timestamp: new Date().toISOString(),
+        description,
+        diseases,
+        results
+      });
     }
   };
 
@@ -111,7 +130,7 @@ export default function Page() {
       const data = await response.json();
 
       if (data.result === "success") {
-        saveResultsToLocal(data.data);
+        await saveResultsToLocal(data.data);
       } else {
         setError("Failed to analyze disease.");
       }
@@ -123,13 +142,15 @@ export default function Page() {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setDescription("");
     setDiseases("");
     setDiagnosisResults([]);
-    localStorage.removeItem("analyze-disease-description");
-    localStorage.removeItem("analyze-disease-diseases");
-    localStorage.removeItem("analyze-disease-results");
+    if (selectedPatient) {
+      await deleteDraft('analyze-disease-description', selectedPatient.id);
+      await deleteDraft('analyze-disease-diseases', selectedPatient.id);
+      await deleteDraft('analyze-disease-results', selectedPatient.id);
+    }
   };
 
   const handleDownload = () => {

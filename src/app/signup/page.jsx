@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signUp } from '@/services/authService';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -9,36 +10,24 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('doctor');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // Get existing users
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const { user, error: signUpError } = await signUp(email, password, name, role);
 
-    // Check if email already exists
-    if (users.find(u => u.email === email)) {
-      setError('Email already exists');
+    if (signUpError || !user) {
+      setError(signUpError || 'Failed to create account');
+      setLoading(false);
       return;
     }
 
-    // Create new user
-    const newUser = {
-      id: Date.now(),
-      name,
-      email,
-      password,
-      role
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Auto login
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    if (role === 'doctor') {
+    // Redirect based on role
+    if (user.role === 'doctor') {
       router.push('/analyze-disease');
     } else {
       router.push('/patient-management');
@@ -183,14 +172,15 @@ export default function Signup() {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center items-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                disabled={loading}
+                className="group relative w-full flex justify-center items-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                   <svg className="h-5 w-5 text-cyan-200 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </span>
-                Sign up
+                {loading ? 'Creating account...' : 'Sign up'}
               </button>
             </div>
 

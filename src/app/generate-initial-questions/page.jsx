@@ -5,6 +5,7 @@ import SecondLoader from "@/components/common/Loader/SecondLoader";
 import NavHeader from "@/components/common/NavHeader/NavHeader";
 import ResponseHeader from "@/components/common/ResponseHeader/ResponseHeader";
 import React, { useState, useEffect } from "react";
+import { getDraft, saveDraft } from '@/services/draftService';
 
 export default function Page() {
   const [description, setDescription] = useState("");
@@ -14,26 +15,40 @@ export default function Page() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedDescription = localStorage.getItem("generate-initial-questions-description");
-    const savedDiseases = localStorage.getItem("generate-initial-questions-diseases");
-    const savedQuestions = localStorage.getItem("generate-initial-questions-questions");
+    const loadDrafts = async () => {
+      const { draft: descDraft } = await getDraft('generate-initial-questions-description');
+      const { draft: diseasesDraft } = await getDraft('generate-initial-questions-diseases');
+      const { draft: questionsDraft } = await getDraft('generate-initial-questions-questions');
 
-    if (savedDescription) setDescription(savedDescription);
-    if (savedDiseases) setDiseases(savedDiseases);
-    if (savedQuestions) setQuestions(JSON.parse(savedQuestions));
+      if (descDraft?.data) setDescription(descDraft.data);
+      if (diseasesDraft?.data) setDiseases(diseasesDraft.data);
+      if (questionsDraft?.data) setQuestions(Array.isArray(questionsDraft.data) ? questionsDraft.data : []);
+    };
+
+    loadDrafts();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("generate-initial-questions-description", description);
+    const saveDescription = async () => {
+      if (description) {
+        await saveDraft('generate-initial-questions-description', description);
+      }
+    };
+    saveDescription();
   }, [description]);
 
   useEffect(() => {
-    localStorage.setItem("generate-initial-questions-diseases", diseases);
+    const saveDiseases = async () => {
+      if (diseases) {
+        await saveDraft('generate-initial-questions-diseases', diseases);
+      }
+    };
+    saveDiseases();
   }, [diseases]);
 
-  const saveQuestionsToLocal = (newQuestions) => {
+  const saveQuestionsToLocal = async (newQuestions) => {
     setQuestions(newQuestions);
-    localStorage.setItem("generate-initial-questions-questions", JSON.stringify(newQuestions));
+    await saveDraft('generate-initial-questions-questions', newQuestions);
   };
 
   const handleSubmit = async (e) => {
@@ -59,7 +74,7 @@ export default function Page() {
       const data = await response.json();
 
       if (data.result === "success") {
-        saveQuestionsToLocal(data.data.questions);
+        await saveQuestionsToLocal(data.data.questions);
       } else {
         setError("Failed to generate questions.");
       }
