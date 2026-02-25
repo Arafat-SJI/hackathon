@@ -1,0 +1,20 @@
+---
+description: API design and usage rules
+globs: src/app/api/**,docs/api/**
+---
+
+## API design
+
+- Follow the principles in `[api-overview.md](mdc:docs/api/contracts/api-overview.md)`.
+- Apply versioning strategy from `[versioning-policy.md](mdc:docs/api/contracts/versioning-policy.md)`.
+
+## Endpoint documentation
+
+- Each module should document its endpoints in a file like `[module-name]-endpoints.md` under `docs/api/endpoints/`.
+- Keep request/response schemas aligned with database schema docs under `docs/database/schema/`.
+
+## Implementation notes
+
+- Prefer thin route handlers delegating to well-defined services.
+- Validate inputs and handle errors according to global error-handling standards.
+

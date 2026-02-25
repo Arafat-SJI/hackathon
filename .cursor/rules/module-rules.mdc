@@ -1,0 +1,20 @@
+---
+description: Module boundaries and feature organization
+globs: src/**,docs/features/**
+---
+
+## Module structure
+
+- Organize code into coherent feature modules that map to folders in `docs/features/`.
+- Keep UI, domain logic, and data access clearly separated as described in `[application-architecture.md](mdc:architecture/application-architecture.md)`.
+
+## Feature documentation
+
+- Each significant feature should have a folder under `docs/features/` following `[template.md](mdc:docs/features/template.md)`.
+- Keep `specification.md`, `implementation-notes.md`, and `testing-strategy.md` in sync with the actual implementation.
+
+## Boundaries
+
+- Avoid tight coupling between modules; prefer calling through well-defined interfaces/services.
+- Cross-module changes that modify boundaries should be reflected in architecture docs and, if needed, an ADR.
+

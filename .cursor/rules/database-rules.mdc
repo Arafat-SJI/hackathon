@@ -1,0 +1,21 @@
+---
+description: Database rules, migrations, and schema standards
+globs: supabase/**,docs/database/**
+---
+
+## Schema & naming
+
+- Follow naming rules in `[naming-conventions.md](mdc:docs/database/rules/naming-conventions.md)`.
+- Use data types defined in `[data-types-standards.md](mdc:docs/database/rules/data-types-standards.md)`.
+- Keep the overall schema in sync with `[current-schema.md](mdc:docs/database/schema/current-schema.md)`.
+
+## Migrations
+
+- Follow `[migration-policy.md](mdc:docs/database/migrations/migration-policy.md)` when adding or changing tables.
+- Record each migration in `[migration-history.md](mdc:docs/database/migrations/migration-history.md)`.
+
+## Indexes & constraints
+
+- Design indexes according to `[indexing-strategy.md](mdc:docs/database/rules/indexing-strategy.md)`.
+- Apply foreign keys and constraints per `[constraints-policy.md](mdc:docs/database/rules/constraints-policy.md)`.
+

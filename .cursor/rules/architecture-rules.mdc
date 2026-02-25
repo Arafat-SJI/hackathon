@@ -1,0 +1,16 @@
+---
+description: Architecture rules for SpecEngine
+globs: src/**,architecture/**
+---
+
+## Architecture constraints
+
+- Follow the high-level system design in `[system-architecture.md](mdc:architecture/system-architecture.md)`.
+- Respect the application layering described in `[application-architecture.md](mdc:architecture/application-architecture.md)`.
+- Keep data flow consistent with `[data-flow.md](mdc:architecture/data-flow.md)`.
+
+## Implementation guidance
+
+- Do not bypass established service or domain layers from the UI.
+- If a change alters cross-cutting concerns (auth, logging, caching), consider writing an ADR using `[0001-template.md](mdc:architecture/ADRs/0001-template.md)`.
+

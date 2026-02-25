@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+
+## Global coding standards
+
+- Follow the primary project style guide in `[coding-style.md](mdc:docs/standards/coding-style.md)`.
+- Prefer clear, explicit code over clever one-liners.
+- Keep functions and components small and focused.
+- Add or update documentation in `docs/` when you introduce non-trivial behavior.
+
+## Error handling & logging
+
+- Use patterns from `[error-handling.md](mdc:docs/standards/error-handling.md)` for consistent error handling.
+- Use logging rules from `[logging-standards.md](mdc:docs/standards/logging-standards.md)` for log levels and formats.
+
+## Documentation expectations
+
+- New features should have a folder under `docs/features/` following `[template.md](mdc:docs/features/template.md)`.
+- Significant technical decisions should be captured as an ADR in `architecture/ADRs/`.
+
