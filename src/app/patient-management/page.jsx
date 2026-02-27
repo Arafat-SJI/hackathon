@@ -25,6 +25,8 @@ export default function PatientManagement() {
   const [summaryDescription, setSummaryDescription] = useState("");
   const [generatedSummary, setGeneratedSummary] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [sendingReportForPatientId, setSendingReportForPatientId] = useState(null);
+  const [sendingWhatsappForPatientId, setSendingWhatsappForPatientId] = useState(null);
   const { currentUser, logout } = useUser();
   const router = useRouter();
 
@@ -298,6 +300,68 @@ export default function PatientManagement() {
     router.push('/login');
   };
 
+  const handleSendReport = async (patient) => {
+    if (!patient?.email) {
+      alert('This patient does not have an email address.');
+      return;
+    }
+
+    try {
+      setSendingReportForPatientId(patient.id);
+
+      const response = await fetch('/api/send-patient-report-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ patientId: patient.id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to send patient report.');
+      }
+
+      alert('Patient report has been emailed successfully.');
+    } catch (error) {
+      console.error('Failed to send patient report:', error);
+      alert(error.message || 'Failed to send patient report.');
+    } finally {
+      setSendingReportForPatientId(null);
+    }
+  };
+
+  const handleSendReportWhatsapp = async (patient) => {
+    if (!patient?.phone) {
+      alert('This patient does not have a phone number.');
+      return;
+    }
+
+    try {
+      setSendingWhatsappForPatientId(patient.id);
+
+      const response = await fetch('/api/send-patient-report-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ patientId: patient.id, channel: 'whatsapp' }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to send patient report via WhatsApp.');
+      }
+
+      alert('Patient report has been sent via WhatsApp successfully.');
+    } catch (error) {
+      console.error('Failed to send patient report via WhatsApp:', error);
+      alert(error.message || 'Failed to send patient report via WhatsApp.');
+    } finally {
+      setSendingWhatsappForPatientId(null);
+    }
+  };
+
   return (
     <div className="px-10 mx-auto">
       <NavHeader title="Patient Management" icon="/images/icons/wired-flat-37-approve-checked-simple-hover-pinch.gif" />
@@ -514,6 +578,28 @@ export default function PatientManagement() {
                           className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-blue-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
                         >
                           Edit
+                        </button>
+                        <button
+                          onClick={() => handleSendReport(patient)}
+                          disabled={!patient.email || sendingReportForPatientId === patient.id}
+                          className={`bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-md font-medium transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-95 ${
+                            !patient.email || sendingReportForPatientId === patient.id
+                              ? 'opacity-50 cursor-not-allowed hover:scale-100'
+                              : 'hover:from-green-600 hover:to-green-700 hover:scale-105'
+                          }`}
+                        >
+                          {sendingReportForPatientId === patient.id ? 'Sending...' : 'Send Report'}
+                        </button>
+                        <button
+                          onClick={() => handleSendReportWhatsapp(patient)}
+                          disabled={!patient.phone || sendingWhatsappForPatientId === patient.id}
+                          className={`bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-2 rounded-md font-medium transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-95 ${
+                            !patient.phone || sendingWhatsappForPatientId === patient.id
+                              ? 'opacity-50 cursor-not-allowed hover:scale-100'
+                              : 'hover:from-emerald-600 hover:to-emerald-700 hover:scale-105'
+                          }`}
+                        >
+                          {sendingWhatsappForPatientId === patient.id ? 'Sending...' : 'Send WhatsApp'}
                         </button>
                         <button
                           onClick={() => handleDeletePatient(patient.id)}
